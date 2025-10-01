@@ -97,3 +97,4 @@ distancias = calcular_distancias(cordenadas, combinacao)
 resposta, menor_caminho = calcular_caminhos(distancias, permutacao)
 print('Menor distancia: ', resposta)
 print('Percorrendo o caminho: ', menor_caminho)
+
