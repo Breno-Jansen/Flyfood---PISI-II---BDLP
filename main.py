@@ -9,7 +9,6 @@ def limpar_terminal():
 pontos = []
 casas = []
 
-
 with open("matriz.txt", "r", encoding="utf-8") as arquivo:
     limpar_terminal()
     linhas = arquivo.readlines()
@@ -17,7 +16,6 @@ with open("matriz.txt", "r", encoding="utf-8") as arquivo:
     qntd_linhas, qntd_colunas = primeira_linha.split(' ')
     qntd_linhas = int(qntd_linhas)
     qntd_colunas = int(qntd_colunas.replace('\n',''))
-
     linhas_sem_a_primeira = linhas[1:]
 
     for i in range(qntd_linhas):
@@ -29,17 +27,7 @@ with open("matriz.txt", "r", encoding="utf-8") as arquivo:
             if elemento == 'R':
                 pos_origem = f'{i} {j}'
             elif elemento != '0':
-                casas.append(f'{elemento}:{i} {j}')  
-    #for i in range(len(linhas_sem_a_primeira)):
-    #    pontos_por_linha = linhas_sem_a_primeira[i].split()
-    #    pontos.append(pontos_por_linha)
-    #    j = -1
-    #    for elemento in pontos[i]:
-    #        j += 1
-    #        if elemento == 'R':
-    #            pos_origem = f'{i} {j}'
-    #        elif elemento != '0':
-    #            casas.append(f'{elemento}:{i} {j}')        
+                casas.append(f'{elemento}:{i} {j}')     
 
 def combinatoria_de_caminhos(pos_origem, casas):
     nome_casas_perm = []
@@ -64,14 +52,11 @@ def combinatoria_de_caminhos(pos_origem, casas):
     # Tirando caminhos duplicados com o set, já que tem 2 R 
     lista_de_permutacoes = list(set(permutacoes_com_R_fixo))# Permutação que define todos caminhos possíveis
 
-
     nome_casas_comb.append('R')
     cordenada_casas.append(pos_origem)
     combinacoes = itertools.permutations(nome_casas_comb, 2)
     lista_de_combinacoes = list(combinacoes)        # Arranjo que define todas duplas possíveis para calculo de distância
-
     return lista_de_permutacoes, lista_de_combinacoes, cordenada_casas
-    
     
 def calcular_distancias(cordenadas, combinacao):
     cord_casa_array = []
@@ -94,7 +79,6 @@ def calcular_caminhos(distancias, permutacao):
     for i in range(len(permutacao)):
         soma_distancia_do_caminho = 0
         
-        
         for j in range(len(permutacao[i])):
             try:
                 cada_distancia = (f'{permutacao[i][j]}', f'{permutacao[i][j+1]}')
@@ -102,25 +86,14 @@ def calcular_caminhos(distancias, permutacao):
                 soma_distancia_do_caminho += valor_cada_distancia
             except:
                 pass
-        #print(soma_distancia_do_caminho)
-        
+   
         if soma_distancia_do_caminho < menor_distancia:
             menor_distancia = soma_distancia_do_caminho
             menor_permutacao = permutacao[i]
     return menor_distancia, menor_permutacao
-        
-
-
-#print(*pontos, sep='\n\n')
-#print('\nponto de origem: ', pos_origem)
-#print('casas na matriz: ', casas,'\n')
 
 permutacao, combinacao, cordenadas = combinatoria_de_caminhos(pos_origem, casas)
-#print(combinacao)
-#print(cordenadas)
-#print(permutacao)
 distancias = calcular_distancias(cordenadas, combinacao)
-#print(distancias)
 resposta, menor_caminho = calcular_caminhos(distancias, permutacao)
 print('Menor distancia: ', resposta)
 print('Percorrendo o caminho: ', menor_caminho)
