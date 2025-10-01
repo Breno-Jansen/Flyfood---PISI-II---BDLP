@@ -17,7 +17,6 @@ with open("matriz.txt", "r", encoding="utf-8") as arquivo:
     qntd_linhas, qntd_colunas = primeira_linha.split(' ')
     qntd_linhas = int(qntd_linhas)
     qntd_colunas = int(qntd_colunas.replace('\n',''))
-    print(qntd_linhas, qntd_colunas)
 
     linhas_sem_a_primeira = linhas[1:]
 
@@ -120,6 +119,8 @@ permutacao, combinacao, cordenadas = combinatoria_de_caminhos(pos_origem, casas)
 #print(combinacao)
 #print(cordenadas)
 #print(permutacao)
-distancias = calcular_distancias( cordenadas, combinacao)
+distancias = calcular_distancias(cordenadas, combinacao)
 #print(distancias)
-print(calcular_caminhos(distancias, permutacao))
+resposta, menor_caminho = calcular_caminhos(distancias, permutacao)
+print('Menor distancia: ', resposta)
+print('Percorrendo o caminho: ', menor_caminho)
