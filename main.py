@@ -73,7 +73,7 @@ def calcular_distancias(cordenadas, combinacao):
     return dict_distancias
 
 def calcular_caminhos(distancias, permutacao):
-    menor_distancia = 999999999999999
+    menor_distancia = -1
     menor_permutacao = ()
     for i in range(len(permutacao)):
         soma_distancia_do_caminho = 0
@@ -86,7 +86,7 @@ def calcular_caminhos(distancias, permutacao):
             except:
                 pass
    
-        if soma_distancia_do_caminho < menor_distancia:
+        if (soma_distancia_do_caminho < menor_distancia) or (menor_distancia == -1):
             menor_distancia = soma_distancia_do_caminho
             menor_permutacao = permutacao[i]
     return menor_distancia, menor_permutacao
