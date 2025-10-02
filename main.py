@@ -21,9 +21,8 @@ with open("matriz.txt", "r", encoding="utf-8") as arquivo:
     for i in range(qntd_linhas):
         pontos_por_linha = linhas_sem_a_primeira[i].split()
         pontos.append(pontos_por_linha)
-        j = -1
-        for elemento in pontos[i]:
-            j += 1
+        for j in range(qntd_colunas):
+            elemento = pontos[i][j]
             if elemento == 'R':
                 pos_origem = f'{i} {j}'
             elif elemento != '0':
