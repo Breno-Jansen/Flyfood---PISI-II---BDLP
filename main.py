@@ -33,7 +33,7 @@ def executar_calculo(entry_widget):
         pontos = []
         casas = []
 
-        with open("matriz.txt", "r", encoding="utf-8") as arquivo:
+        with open(caminho_do_arquivo, "r", encoding="utf-8") as arquivo:
             linhas = arquivo.readlines()
             primeira_linha = linhas[0]
             qntd_linhas, qntd_colunas = primeira_linha.split(' ')
@@ -131,3 +131,5 @@ def executar_calculo(entry_widget):
         # Em caso de erro na leitura ou processamento, exibe o erro na interface
         entry_widget.delete("1.0", "end")
         entry_widget.insert("1.0", f"Ocorreu um erro:\n{e}\n\nVerifique o formato do arquivo .txt.")
+
+
