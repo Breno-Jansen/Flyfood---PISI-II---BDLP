@@ -1,6 +1,7 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-
+from tkinter import filedialog
+import main
 
 def relative_to_assets(path: str) -> Path:
     output_path = Path(__file__).parent
@@ -23,6 +24,7 @@ canvas = Canvas(
 )
 
 canvas.place(x = 0, y = 0)
+
 image_image_1 = PhotoImage(
     file=relative_to_assets("image_1.png"))
 image_1 = canvas.create_image(
@@ -37,7 +39,7 @@ button_1 = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_1 clicked"),
+    command=main.executar_calculo,
     relief="flat",
     activebackground="#409AE4"
 )
@@ -74,7 +76,7 @@ button_2 = Button(
     image=button_image_2,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_2 clicked"),
+    command=main.selecionar_arquivo,
     relief="flat",
     activebackground="#409AE4"
 )
