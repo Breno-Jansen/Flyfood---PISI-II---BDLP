@@ -3,6 +3,7 @@ import re
 import numpy as np
 import itertools
 from tkinter import filedialog
+import time
 
 def selecionar_arquivo(entry_widget):
     """
@@ -22,14 +23,19 @@ def executar_calculo(entry_widget):
     Esta função é chamada pelo button_1.
     Executa toda a lógica de cálculo e exibe o resultado em entry_widget.
     """
+    iniciar_tempo = time.perf_counter()
+
     global caminho_do_arquivo
     # Verifica se um arquivo foi selecionado primeiro
     if not caminho_do_arquivo:
         entry_widget.delete("1.0", "end")
         entry_widget.insert("1.0", "Erro: Por favor, carregue um arquivo .txt primeiro.")
         return
-
+    entry_widget.delete("1.0", "end")
+    entry_widget.insert("1.0", "Calculando...")
+    entry_widget.update_idletasks()
     try:
+        
         pontos = []
         casas = []
 
@@ -49,7 +55,7 @@ def executar_calculo(entry_widget):
                     if elemento == 'R':
                         pos_origem = f'{i} {j}'
                     elif elemento != '0':
-                        casas.append(f'{elemento}:{i} {j}')     
+                        casas.append(f'{elemento}:{i} {j}')  
 
         def combinatoria_de_caminhos(pos_origem, casas):
             nome_casas_perm = []
@@ -68,7 +74,7 @@ def executar_calculo(entry_widget):
             nome_casas_perm.insert(-1,'R')
             elemento_fixo = 'R'
             
-            permutacoes = list(itertools.permutations(nome_casas_perm))
+            permutacoes = itertools.permutations(nome_casas_perm)
             # Fixando o R inicial e o R final
             permutacoes_com_R_fixo = [r for r in permutacoes if (r[0] == elemento_fixo) and (r[-1] == elemento_fixo)]
             # Tirando caminhos duplicados com o set, já que tem 2 R 
@@ -113,14 +119,18 @@ def executar_calculo(entry_widget):
                     menor_distancia = soma_distancia_do_caminho
                     menor_permutacao = permutacao[i]
             return menor_distancia, menor_permutacao
-
+        
         permutacao, combinacao, cordenadas = combinatoria_de_caminhos(pos_origem, casas)
         distancias = calcular_distancias(cordenadas, combinacao)
         resposta, menor_caminho = calcular_caminhos(distancias, permutacao)
 
+        encerrar_tempo = time.perf_counter()
+        tempo_de_execucao = encerrar_tempo - iniciar_tempo
+
         resultado_formatado = (
             f"Menor distância: {resposta}\n\n"
-            f"Percorrendo o caminho:\n{' -> '.join(menor_caminho)}"
+            f"Percorrendo o caminho:\n{' -> '.join(menor_caminho)}\n\n"
+            f"Tempo gasto no cálculo:\n{tempo_de_execucao} s"
         )
 
         # Limpa o campo de texto e insere o novo resultado
@@ -130,9 +140,7 @@ def executar_calculo(entry_widget):
     except Exception as e:
         # Em caso de erro na leitura ou processamento, exibe o erro na interface
         entry_widget.delete("1.0", "end")
-        entry_widget.insert("1.0", f"Ocorreu um erro:\nTecnicamente:{e}\n\nVerifique se o formato do arquivo .txt está na forma certa:\n
-        EX:\n
-        33\n
-        C00\n00B\nR0A\n")
-
-
+        entry_widget.insert("1.0", f"Ocorreu um erro:\nTecnicamente: {e}\n\nVerifique se o formato do arquivo .txt está na forma certa:\n"
+        "EX:\n"
+        "33\n"
+        "C00\n00B\nR0A\n")
