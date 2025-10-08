@@ -130,6 +130,9 @@ def executar_calculo(entry_widget):
     except Exception as e:
         # Em caso de erro na leitura ou processamento, exibe o erro na interface
         entry_widget.delete("1.0", "end")
-        entry_widget.insert("1.0", f"Ocorreu um erro:\n{e}\n\nVerifique o formato do arquivo .txt.")
+        entry_widget.insert("1.0", f"Ocorreu um erro:\nTecnicamente:{e}\n\nVerifique se o formato do arquivo .txt está na forma certa:\n
+        EX:\n
+        33\n
+        C00\n00B\nR0A\n")
 
 
