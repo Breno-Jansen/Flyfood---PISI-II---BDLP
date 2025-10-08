@@ -1,133 +1,90 @@
-import os 
-import re
-import numpy as np
-import itertools
+from pathlib import Path
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 from tkinter import filedialog
+import main
 
-def selecionar_arquivo(entry_widget):
-    """
-    Recebe o widget de texto como parâmetro para poder escrever nele.
-    """
-    global caminho_do_arquivo
-    filetypes = (('Text files', '*.txt'), ('All files', '*.*'))
-    fpath = filedialog.askopenfilename(title="Selecione o arquivo de matriz", filetypes=filetypes)
-    if fpath:
-        caminho_do_arquivo = fpath
-        entry_widget.delete("1.0", "end")
-        entry_widget.insert("1.0", f"Arquivo carregado:\n{os.path.basename(caminho_do_arquivo)}")
+def relative_to_assets(path: str) -> Path:
+    output_path = Path(__file__).parent
+    assets_path = output_path / "assets" / "frame0"
+    return assets_path / Path(path)
+
+window = Tk()
+window.geometry("1221x672")
+window.configure(bg = "#409AE4")
 
 
-def executar_calculo(entry_widget):
-    """
-    Esta função é chamada pelo button_1.
-    Executa toda a lógica de cálculo e exibe o resultado em entry_widget.
-    """
-    global caminho_do_arquivo
-    # Verifica se um arquivo foi selecionado primeiro
-    if not caminho_do_arquivo:
-        entry_widget.delete("1.0", "end")
-        entry_widget.insert("1.0", "Erro: Por favor, carregue um arquivo .txt primeiro.")
-        return
+canvas = Canvas(
+    window,
+    bg = "#409AE4",
+    height = 672,
+    width = 1221,
+    bd = 0,
+    highlightthickness = 0,
+    relief = "ridge"
+)
 
-    try:
-        pontos = []
-        casas = []
+canvas.place(x = 0, y = 0)
 
-        with open("matriz.txt", "r", encoding="utf-8") as arquivo:
-            linhas = arquivo.readlines()
-            primeira_linha = linhas[0]
-            qntd_linhas, qntd_colunas = primeira_linha.split(' ')
-            qntd_linhas = int(qntd_linhas)
-            qntd_colunas = int(qntd_colunas.replace('\n',''))
-            linhas_sem_a_primeira = linhas[1:]
+image_image_1 = PhotoImage(
+    file=relative_to_assets("image_1.png"))
+image_1 = canvas.create_image(
+    610.0,
+    336.0,
+    image=image_image_1
+)
 
-            for i in range(qntd_linhas):
-                pontos_por_linha = linhas_sem_a_primeira[i].split()
-                pontos.append(pontos_por_linha)
-                for j in range(qntd_colunas):
-                    elemento = pontos[i][j]
-                    if elemento == 'R':
-                        pos_origem = f'{i} {j}'
-                    elif elemento != '0':
-                        casas.append(f'{elemento}:{i} {j}')     
+button_image_1 = PhotoImage(
+    file=relative_to_assets("button_1.png"))
+button_1 = Button(
+    image=button_image_1,
+    borderwidth=0,
+    highlightthickness=0,
+    command=main.executar_calculo,
+    relief="flat",
+    activebackground="#409AE4"
+)
+button_1.place(
+    x=196.0,
+    y=477.0,
+    width=356.0,
+    height=116.0
+)
 
-        def combinatoria_de_caminhos(pos_origem, casas):
-            nome_casas_perm = []
-            nome_casas_comb = []
-            cordenada_casas = []
-            for i in range(len(casas)):
-                separacao = casas[i].split(':')
-                letra_casa = separacao[0]
-                pos_casa = separacao[1]
+entry_image_1 = PhotoImage(
+    file=relative_to_assets("entry_1.png"))
+entry_bg_1 = canvas.create_image(
+    379.5,
+    352.5,
+    image=entry_image_1
+)
+entry_1 = Text(
+    bd=0,
+    bg="#EDEDED",
+    fg="#000716",
+    highlightthickness=0
+)
+entry_1.place(
+    x=205.0,
+    y=240.0,
+    width=349.0,
+    height=223.0
+)
 
-                nome_casas_perm.append(letra_casa)
-                nome_casas_comb.append(letra_casa)
-                cordenada_casas.append(pos_casa)
-
-            nome_casas_perm.insert(0,'R')
-            nome_casas_perm.insert(-1,'R')
-            elemento_fixo = 'R'
-            
-            permutacoes = list(itertools.permutations(nome_casas_perm))
-            # Fixando o R inicial e o R final
-            permutacoes_com_R_fixo = [r for r in permutacoes if (r[0] == elemento_fixo) and (r[-1] == elemento_fixo)]
-            # Tirando caminhos duplicados com o set, já que tem 2 R 
-            lista_de_permutacoes = list(set(permutacoes_com_R_fixo))# Permutação que define todos caminhos possíveis
-
-            nome_casas_comb.append('R')
-            cordenada_casas.append(pos_origem)
-            combinacoes = itertools.permutations(nome_casas_comb, 2)
-            lista_de_combinacoes = list(combinacoes)        # Arranjo que define todas duplas possíveis para calculo de distância
-            return lista_de_permutacoes, lista_de_combinacoes, cordenada_casas
-            
-        def calcular_distancias(cordenadas, combinacao):
-            cord_casa_array = []
-
-            for i in range(len(cordenadas)):
-                valor_da_pos = (re.findall(r'\d+', cordenadas[i]))
-                pos_casa = np.array(valor_da_pos, dtype=int)
-                cord_casa_array.append(pos_casa)
-
-            distancias = [np.abs(a - b) for a, b in itertools.permutations(cord_casa_array, 2)]
-            somas = [int(np.sum(array)) for array in distancias]
-
-            dict_distancias = dict(zip(combinacao, somas))
-
-            return dict_distancias
-
-        def calcular_caminhos(distancias, permutacao):
-            menor_distancia = -1
-            menor_permutacao = ()
-            for i in range(len(permutacao)):
-                soma_distancia_do_caminho = 0
-                
-                for j in range(len(permutacao[i])):
-                    try:
-                        cada_distancia = (f'{permutacao[i][j]}', f'{permutacao[i][j+1]}')
-                        valor_cada_distancia = distancias[cada_distancia]
-                        soma_distancia_do_caminho += valor_cada_distancia
-                    except:
-                        pass
-        
-                if (soma_distancia_do_caminho < menor_distancia) or (menor_distancia == -1):
-                    menor_distancia = soma_distancia_do_caminho
-                    menor_permutacao = permutacao[i]
-            return menor_distancia, menor_permutacao
-
-        permutacao, combinacao, cordenadas = combinatoria_de_caminhos(pos_origem, casas)
-        distancias = calcular_distancias(cordenadas, combinacao)
-        resposta, menor_caminho = calcular_caminhos(distancias, permutacao)
-
-        resultado_formatado = (
-            f"Menor distância: {resposta}\n\n"
-            f"Percorrendo o caminho:\n{' -> '.join(menor_caminho)}"
-        )
-
-        # Limpa o campo de texto e insere o novo resultado
-        entry_widget.delete("1.0", "end")
-        entry_widget.insert("1.0", resultado_formatado)
-        
-    except Exception as e:
-        # Em caso de erro na leitura ou processamento, exibe o erro na interface
-        entry_widget.delete("1.0", "end")
-        entry_widget.insert("1.0", f"Ocorreu um erro:\n{e}\n\nVerifique o formato do arquivo .txt.")
+button_image_2 = PhotoImage(
+    file=relative_to_assets("button_2.png"))
+button_2 = Button(
+    image=button_image_2,
+    borderwidth=0,
+    highlightthickness=0,
+    command=main.selecionar_arquivo,
+    relief="flat",
+    activebackground="#409AE4"
+)
+button_2.place(
+    x=696.0,
+    y=493.0,
+    width=356.0,
+    height=116.0
+)
+window.resizable(False, False)
+window.mainloop()
