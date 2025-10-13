@@ -1,13 +1,16 @@
-import os 
+import os
 import re
 import numpy as np
 import itertools
 from tkinter import filedialog
 import time
+import math
+
 
 def selecionar_arquivo(entry_widget):
     """
     Recebe o widget de texto como parâmetro para poder escrever nele.
+    Reconhece quando o arquivo é carregado.
     """
     global caminho_do_arquivo
     filetypes = (('Text files', '*.txt'), ('All files', '*.*'))
@@ -32,7 +35,7 @@ def executar_calculo(entry_widget):
         entry_widget.insert("1.0", "Erro: Por favor, carregue um arquivo .txt primeiro.")
         return
     entry_widget.delete("1.0", "end")
-    entry_widget.insert("1.0", "Calculando...")
+    entry_widget.insert("1.0", "Calculando.....")
     entry_widget.update_idletasks()
     try:
         
@@ -43,7 +46,7 @@ def executar_calculo(entry_widget):
             linhas = arquivo.readlines()
             primeira_linha = linhas[0]
             qntd_linhas, qntd_colunas = primeira_linha.split(' ')
-            qntd_linhas = int(qntd_linhas)
+            qntd_linhas = int(qntd_linhas) # Identifica entrada de linhas e colunas
             qntd_colunas = int(qntd_colunas.replace('\n',''))
             linhas_sem_a_primeira = linhas[1:]
 
@@ -57,72 +60,93 @@ def executar_calculo(entry_widget):
                     elif elemento != '0':
                         casas.append(f'{elemento}:{i} {j}')  
 
-        def combinatoria_de_caminhos(pos_origem, casas):
-            nome_casas_perm = []
-            nome_casas_comb = []
+        def separando_cordenadas(pos_origem, casas):
+            """
+            Faz a separação das cordenadas dos nomes (Ex: (A: 1 1) para (A) e (1 1)).
+            Também adiciona a posição de origem às casas (Ex: (A B C) para (R A B C))
+            """
+
+            nome_casas = []
             cordenada_casas = []
             for i in range(len(casas)):
                 separacao = casas[i].split(':')
                 letra_casa = separacao[0]
                 pos_casa = separacao[1]
-
-                nome_casas_perm.append(letra_casa)
-                nome_casas_comb.append(letra_casa)
+                nome_casas.append(letra_casa)
                 cordenada_casas.append(pos_casa)
 
-            nome_casas_perm.insert(0,'R')
-            nome_casas_perm.insert(-1,'R')
-            elemento_fixo = 'R'
-            
-            permutacoes = itertools.permutations(nome_casas_perm)
-            # Fixando o R inicial e o R final
-            permutacoes_com_R_fixo = [r for r in permutacoes if (r[0] == elemento_fixo) and (r[-1] == elemento_fixo)]
-            # Tirando caminhos duplicados com o set, já que tem 2 R 
-            lista_de_permutacoes = list(set(permutacoes_com_R_fixo))# Permutação que define todos caminhos possíveis
-
-            nome_casas_comb.append('R')
+            # adiciona R (origem)
+            nome_casas.append('R')
             cordenada_casas.append(pos_origem)
-            combinacoes = itertools.permutations(nome_casas_comb, 2)
-            lista_de_combinacoes = list(combinacoes)        # Arranjo que define todas duplas possíveis para calculo de distância
-            return lista_de_permutacoes, lista_de_combinacoes, cordenada_casas
-            
-        def calcular_distancias(cordenadas, combinacao):
-            cord_casa_array = []
 
-            for i in range(len(cordenadas)):
-                valor_da_pos = (re.findall(r'\d+', cordenadas[i]))
-                pos_casa = np.array(valor_da_pos, dtype=int)
-                cord_casa_array.append(pos_casa)
+            return nome_casas, cordenada_casas
 
-            distancias = [np.abs(a - b) for a, b in itertools.permutations(cord_casa_array, 2)]
-            somas = [int(np.sum(array)) for array in distancias]
+        def calcular_matriz_distancias(cordenadas, nome_casas):
+            """
+            Cria uma matriz NxN com a distância Manhattan entre todos os pontos.
+            Também cria um dicionário para acessar distâncias por nome ('A','B',...).
+            """
+            n = len(cordenadas)
+            matriz = np.zeros((n, n), dtype=int)
 
-            dict_distancias = dict(zip(combinacao, somas))
+            # Converter todas as coordenadas de string "i j" para tuplas (i,j)
+            coords_numericas = []
+            for c in cordenadas:
+                numeros = re.findall(r'\d+', c)
+                linha = int(numeros[0])
+                coluna = int(numeros[1])
+                coords_numericas.append((linha, coluna))
+
+            # Preenche a matriz de distâncias
+            for i in range(n):
+                for j in range(n):
+                    x1, y1 = coords_numericas[i]
+                    x2, y2 = coords_numericas[j]
+                    distancia = abs(x1 - x2) + abs(y1 - y2)
+                    matriz[i][j] = distancia
+
+            # Cria um dicionário de distâncias com pares de nomes
+            dict_distancias = {}
+            for i in range(n):
+                for j in range(n):
+                    a = nome_casas[i]
+                    b = nome_casas[j]
+                    dict_distancias[(a, b)] = matriz[i][j]
 
             return dict_distancias
 
-        def calcular_caminhos(distancias, permutacao):
-            menor_distancia = -1
+        def calcular_caminhos(distancias, nome_casas):
+            """
+            Testa todas as permutações (força bruta), sem armazenar todas na memória.
+            Mantém apenas o menor caminho encontrado.
+            """
+            menor_distancia = math.inf
             menor_permutacao = ()
-            for i in range(len(permutacao)):
+
+            # As casas que não são 'R'
+            casas_sem_R = [c for c in nome_casas if c != 'R']
+
+            for permutacao in itertools.permutations(casas_sem_R):
+                caminho = ['R'] + list(permutacao) + ['R']
+
                 soma_distancia_do_caminho = 0
-                
-                for j in range(len(permutacao[i])):
-                    try:
-                        cada_distancia = (f'{permutacao[i][j]}', f'{permutacao[i][j+1]}')
-                        valor_cada_distancia = distancias[cada_distancia]
-                        soma_distancia_do_caminho += valor_cada_distancia
-                    except:
-                        pass
-        
-                if (soma_distancia_do_caminho < menor_distancia) or (menor_distancia == -1):
+                for i in range(len(caminho) - 1):
+                    a = caminho[i]
+                    b = caminho[i + 1]
+                    soma_distancia_do_caminho += distancias[(a, b)]
+
+                if soma_distancia_do_caminho < menor_distancia:
                     menor_distancia = soma_distancia_do_caminho
-                    menor_permutacao = permutacao[i]
+                    menor_permutacao = caminho
+
             return menor_distancia, menor_permutacao
         
-        permutacao, combinacao, cordenadas = combinatoria_de_caminhos(pos_origem, casas)
-        distancias = calcular_distancias(cordenadas, combinacao)
-        resposta, menor_caminho = calcular_caminhos(distancias, permutacao)
+        
+
+        # Execução das funções
+        nome_casas, cordenadas = separando_cordenadas(pos_origem, casas)
+        distancias = calcular_matriz_distancias(cordenadas, nome_casas)
+        resposta, menor_caminho = calcular_caminhos(distancias, nome_casas)
 
         encerrar_tempo = time.perf_counter()
         tempo_de_execucao = encerrar_tempo - iniciar_tempo
@@ -130,7 +154,7 @@ def executar_calculo(entry_widget):
         resultado_formatado = (
             f"Menor distância: {resposta}\n\n"
             f"Percorrendo o caminho:\n{' -> '.join(menor_caminho)}\n\n"
-            f"Tempo gasto no cálculo:\n{tempo_de_execucao} s"
+            f"Tempo gasto no cálculo:\n{tempo_de_execucao:.4f} s"
         )
 
         # Limpa o campo de texto e insere o novo resultado
@@ -138,9 +162,9 @@ def executar_calculo(entry_widget):
         entry_widget.insert("1.0", resultado_formatado)
         
     except Exception as e:
-        # Em caso de erro na leitura ou processamento, exibe o erro na interface
-        entry_widget.delete("1.0", "end")
-        entry_widget.insert("1.0", f"Ocorreu um erro:\nTecnicamente: {e}\n\nVerifique se o formato do arquivo .txt está na forma certa:\n"
-        "EX:\n"
-        "33\n"
-        "C00\n00B\nR0A\n")
+        if not MemoryError:
+            entry_widget.delete("1.0", "end")
+            entry_widget.insert("1.0", f"Ocorreu um erro:\nTecnicamente: {e}\n\nVerifique se o formato do arquivo .txt está na forma certa:\n"
+            "EX:\n"
+            "33\n"
+            "C00\n00B\nR0A\n")
