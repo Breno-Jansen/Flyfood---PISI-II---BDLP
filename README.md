@@ -103,9 +103,9 @@ Siga os passos abaixo para executar o Fly Food em seu ambiente local.
     ```
 
 4.  **Execute a aplicação:**
-    O ponto de entrada da interface gráfica é o arquivo `gui.py`.
+    O ponto de entrada da interface gráfica é o arquivo `main.py`.
     ```bash
-    python Main.py
+    python main.py
     ```
 
 ---
