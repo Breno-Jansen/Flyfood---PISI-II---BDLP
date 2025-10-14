@@ -41,7 +41,7 @@ A interface gráfica foi projetada para ser simples e direta, focando na usabili
 
 | Tela Principal | Resultado do Cálculo |
 | :---: | :---: |
-| *<center>(Screenshot da sua aplicação com o campo de texto vazio ou com a mensagem inicial)</center>* | *<center>(Screenshot da sua aplicação exibindo uma rota calculada, a distância e o tempo de execução)</center>* |
+| *<center><img src="https://i.ibb.co/0yKr4HhP/unnamed.png" alt="unnamed" border="0"></center>* | *<center><img src="https://i.ibb.co/rR36mR0m/unnamed.png" alt="unnamed" border="0"></center>* |
 
 ---
 
