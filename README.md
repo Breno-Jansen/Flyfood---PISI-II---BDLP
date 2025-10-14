@@ -95,7 +95,7 @@ Siga os passos abaixo para executar o Fly Food em seu ambiente local.
     source venv/bin/activate
     ```
     
-3.  ** Instale as bibliotecas:**
+3.  **Instale as bibliotecas:**
     
     ```bash
     pip install -r numpy
