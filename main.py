@@ -1,7 +1,7 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 from tkinter import filedialog
-import main
+import funcoes_rota
 
 def relative_to_assets(path: str) -> Path:
     output_path = Path(__file__).parent
@@ -39,7 +39,7 @@ button_1 = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: main.executar_calculo(entry_1),
+    command=lambda: funcoes_rota.executar_calculo(entry_1),
     relief="flat",
     activebackground="#409AE4"
 )
@@ -77,7 +77,7 @@ button_2 = Button(
     image=button_image_2,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: main.selecionar_arquivo(entry_1),
+    command=lambda: funcoes_rota.selecionar_arquivo(entry_1),
     relief="flat",
     activebackground="#409AE4"
 )
@@ -88,4 +88,4 @@ button_2.place(
     height=116.0
 )
 window.resizable(False, False)
-window.mainloop()
+window.funcoes_rotaloop()
