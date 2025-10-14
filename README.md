@@ -1,7 +1,7 @@
 # Fly Food 🚁
 
 <p align="center">
-  <img src="https://i.imgur.com/7v5ASiC.png" width="400" alt="Logo do Projeto Fly Food">
+  <img src="https://i.ibb.co/TxftJ0c5/Fly-food-logo.png" alt="Fly-food-logo" border="0">
 </p>
 
 <p align="center">
