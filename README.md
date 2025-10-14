@@ -80,8 +80,7 @@ Siga os passos abaixo para executar o Fly Food em seu ambiente local.
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [URL_DO_SEU_REPOSITORIO_AQUI]
-    cd [NOME_DA_PASTA_DO_PROJETO]
+    git clone [https://github.com/Breno-Jansen/Flyfood---PISI-II---BDLP.git](https://github.com/Breno-Jansen/Flyfood---PISI-II---BDLP.git)
     ```
 
 2.  **Crie e ative um ambiente virtual (Recomendado):**
@@ -96,20 +95,17 @@ Siga os passos abaixo para executar o Fly Food em seu ambiente local.
     source venv/bin/activate
     ```
     
-3.  **Instale as dependências:**
-    Crie um arquivo chamado `requirements.txt` na raiz do projeto com o seguinte conteúdo:
-    ```txt
-    numpy
-    ```
-    Em seguida, instale-o com o pip:
+3.  ** Instale as bibliotecas:**
+    
     ```bash
-    pip install -r requirements.txt
+    pip install -r numpy
+    pip install -r pillow
     ```
 
 4.  **Execute a aplicação:**
     O ponto de entrada da interface gráfica é o arquivo `gui.py`.
     ```bash
-    python gui.py
+    python Main.py
     ```
 
 ---
