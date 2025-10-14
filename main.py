@@ -1,6 +1,5 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-from tkinter import filedialog
+from tkinter import Tk, Canvas, Text, Button, PhotoImage
 import funcoes_rota
 
 def relative_to_assets(path: str) -> Path:
@@ -88,4 +87,4 @@ button_2.place(
     height=116.0
 )
 window.resizable(False, False)
-window.funcoes_rotaloop()
+window.mainloop()
